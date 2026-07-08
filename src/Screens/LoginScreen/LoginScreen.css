@@ -1,0 +1,157 @@
+.auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 2.5rem 2rem;
+  transition: var(--transition-theme);
+}
+
+.auth-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 0.5rem;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 1.75rem;
+  color: var(--color-ink);
+}
+
+.auth-field {
+  margin-bottom: 1.25rem;
+}
+
+.auth-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-ink-soft);
+  margin-bottom: 0.4rem;
+}
+
+.auth-field input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  transition:
+    var(--transition-theme),
+    border-color 0.15s ease;
+  /* Evita zoom automático en iOS al enfocar inputs */
+  font-size: max(16px, 0.95rem);
+}
+
+.auth-field input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(199, 133, 61, 0.18);
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-accent-ink);
+  background-color: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: filter 0.15s ease;
+  /* Altura mínima táctil recomendada por Apple/Google */
+  min-height: 44px;
+}
+
+.auth-submit:hover {
+  filter: brightness(1.06);
+}
+
+.auth-submit:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.auth-footer {
+  margin: 1.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+.auth-footer a {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 0.3rem;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
+  font-size: 0.85rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.25rem;
+}
+
+/* --- Responsivo --- */
+
+/* Móvil pequeño (320px - 480px) */
+@media (max-width: 480px) {
+  .auth-screen {
+    align-items: flex-start;
+    padding: 2rem 1rem 1.5rem;
+  }
+
+  .auth-card {
+    /* Sin bordes ni sombra en pantallas muy chicas — ocupa toda la pantalla */
+    max-width: 100%;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1.75rem 1.25rem;
+  }
+
+  .auth-title {
+    font-size: 1.65rem;
+  }
+}
+
+/* Pantallas muy anchas (1600px+) — centramos y limitamos el ancho del fondo */
+@media (min-width: 1600px) {
+  .auth-screen {
+    padding: 2rem;
+  }
+
+  .auth-card {
+    max-width: 420px;
+  }
+}
