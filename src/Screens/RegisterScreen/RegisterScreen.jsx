@@ -15,12 +15,20 @@ export const RegisterScreen = () => {
     nombre: "",
     email: "",
     password: "",
+    confirm_password: "",
   };
 
   async function onSubmit(formData) {
     try {
       setErrorMessage("");
       setSuccessMessage("");
+
+      // Validación de contraseñas coincidentes — se hace en el front
+      // antes de enviar cualquier cosa al backend
+      if (formData.password !== formData.confirm_password) {
+        setErrorMessage("Las contraseñas no coinciden");
+        return;
+      }
 
       const response = await register(
         formData.nombre,
@@ -85,6 +93,16 @@ export const RegisterScreen = () => {
               name="password"
               type="password"
               value={formState.password}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="auth-field">
+            <label htmlFor="confirm_password">Repetir contraseña</label>
+            <input
+              id="confirm_password"
+              name="confirm_password"
+              type="password"
+              value={formState.confirm_password}
               onChange={handleChange}
             />
           </div>
