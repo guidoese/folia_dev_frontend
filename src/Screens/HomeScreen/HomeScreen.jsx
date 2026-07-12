@@ -7,6 +7,7 @@ import {
   updateNote,
   deleteNote,
 } from "../../services/notes.service";
+import { deleteAccount } from "../../services/authService";
 import { ThemeToggle } from "../../components/ThemeToggle";
 import "../../theme.css";
 import "./HomeScreen.css";
@@ -15,8 +16,14 @@ export const HomeScreen = () => {
   const { token, logout } = useAuth();
 
   const [notes, setNotes] = useState([]);
-  const [editing_note_id, setEditingNoteId] = useState(null); // null = modo "crear", con id = modo "editar"
+  const [editing_note_id, setEditingNoteId] = useState(null);
   const [error_message, setErrorMessage] = useState("");
+
+  // Estado del modal de eliminar cuenta
+  const [show_delete_modal, setShowDeleteModal] = useState(false);
+  const [delete_password, setDeletePassword] = useState("");
+  const [delete_error, setDeleteError] = useState("");
+  const [delete_loading, setDeleteLoading] = useState(false);
 
   const initial_form_state = {
     titulo: "",
@@ -35,7 +42,6 @@ export const HomeScreen = () => {
       let response;
 
       if (editing_note_id) {
-        // Modo editar
         response = await updateNote(
           token,
           editing_note_id,
@@ -43,7 +49,6 @@ export const HomeScreen = () => {
           formData.contenido,
         );
       } else {
-        // Modo crear
         response = await createNote(token, formData.titulo, formData.contenido);
       }
 
@@ -52,9 +57,9 @@ export const HomeScreen = () => {
         return;
       }
 
-      resetForm(); // limpiamos el formulario después de crear/editar
+      resetForm();
       setEditingNoteId(null);
-      cargarNotas(); // refrescamos la lista
+      cargarNotas();
     } catch (error) {
       setErrorMessage("Ocurrió un error al guardar la nota");
     }
@@ -79,13 +84,13 @@ export const HomeScreen = () => {
       setErrorMessage("Ocurrió un error al cargar las notas");
     }
   }
-  // Cargamos las notas una sola vez, cuando el componente se monta
+
   useEffect(() => {
     cargarNotas();
   }, []);
 
   function handleEditClick(note) {
-    setEditingNoteId(note._id); // Rellenamos el formulario con los datos de la nota que vamos a editar
+    setEditingNoteId(note._id);
     handleChange({ target: { name: "titulo", value: note.titulo } });
     handleChange({ target: { name: "contenido", value: note.contenido } });
   }
@@ -104,9 +109,49 @@ export const HomeScreen = () => {
         return;
       }
 
-      cargarNotas(); // refrescamos la lista
+      cargarNotas();
     } catch (error) {
       setErrorMessage("Ocurrió un error al eliminar la nota");
+    }
+  }
+
+  // --- Modal de eliminar cuenta ---
+
+  function handleOpenDeleteModal() {
+    setDeletePassword("");
+    setDeleteError("");
+    setShowDeleteModal(true);
+  }
+
+  function handleCloseDeleteModal() {
+    setShowDeleteModal(false);
+    setDeletePassword("");
+    setDeleteError("");
+  }
+
+  async function handleDeleteAccount() {
+    try {
+      setDeleteError("");
+
+      if (!delete_password) {
+        setDeleteError("Ingresá tu contraseña para confirmar");
+        return;
+      }
+
+      setDeleteLoading(true);
+      const response = await deleteAccount(token, delete_password);
+      setDeleteLoading(false);
+
+      if (!response.ok) {
+        setDeleteError(response.message);
+        return;
+      }
+
+      // Cerramos sesión y redirigimos al login
+      logout();
+    } catch (error) {
+      setDeleteLoading(false);
+      setDeleteError("Ocurrió un error al eliminar la cuenta");
     }
   }
 
@@ -123,6 +168,13 @@ export const HomeScreen = () => {
         <div className="notes-header-actions">
           <button className="notes-logout" onClick={logout} type="button">
             Cerrar sesión
+          </button>
+          <button
+            className="notes-delete-account"
+            onClick={handleOpenDeleteModal}
+            type="button"
+          >
+            Eliminar cuenta
           </button>
           {/* Toggle integrado al header — visible solo en móvil */}
           <ThemeToggle className="theme-toggle--header" />
@@ -203,6 +255,50 @@ export const HomeScreen = () => {
           </li>
         ))}
       </ul>
+
+      {/* Modal de eliminar cuenta */}
+      {show_delete_modal && (
+        <div className="modal-overlay" onClick={handleCloseDeleteModal}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">Eliminar cuenta</h2>
+            <p className="modal-description">
+              Esta acción es permanente. Se eliminarán tu cuenta y todas tus
+              notas. Ingresá tu contraseña para confirmar.
+            </p>
+
+            {delete_error && <p className="modal-error">{delete_error}</p>}
+
+            <div className="note-field">
+              <label htmlFor="delete_password">Contraseña</label>
+              <input
+                id="delete_password"
+                name="delete_password"
+                type="password"
+                value={delete_password}
+                onChange={(e) => setDeletePassword(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-actions">
+              <button
+                className="modal-cancel"
+                type="button"
+                onClick={handleCloseDeleteModal}
+              >
+                Cancelar
+              </button>
+              <button
+                className="modal-confirm-delete"
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={delete_loading}
+              >
+                {delete_loading ? "Eliminando..." : "Eliminar cuenta"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

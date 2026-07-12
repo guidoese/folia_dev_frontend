@@ -96,3 +96,22 @@ export async function resetPassword(reset_token, password) {
     throw new Error("Error al restablecer la contraseña");
   }
 }
+export async function deleteAccount(token, password) {
+  try {
+    const response_http = await fetch(
+      `${ENVIRONMENT.URL_API}/api/auth/delete-account`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password }),
+      },
+    );
+    const response = await response_http.json();
+    return response;
+  } catch (error) {
+    throw new Error("Error al eliminar la cuenta");
+  }
+}
